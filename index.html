@@ -6,7 +6,9 @@
     <title>Whitehorse Transit</title>
 
     <style>
-        * { box-sizing: border-box; }
+        * {
+            box-sizing: border-box;
+        }
 
         body {
             margin: 0;
@@ -92,7 +94,9 @@
             min-height: 18px;
         }
 
-        /* Preserve original page layout */
+        /*
+         * Keeps the original site layout unchanged.
+         */
         #site-content {
             display: contents;
             visibility: hidden;
@@ -130,7 +134,7 @@
             touch-action: none;
 
             /*
-             * INVISIBLE, BUT STILL CLICKABLE
+             * Invisible, but still receives touches.
              */
             opacity: 0;
 
@@ -142,7 +146,7 @@
         }
 
         /*
-         * Debug mode makes them visible.
+         * "breeze" debug mode reveals the zones.
          */
         .debug-mode .gesture-zone {
             opacity: 1;
@@ -211,16 +215,13 @@
 
             pointer-events: none;
 
-            /*
-             * INVISIBLE BY DEFAULT
-             */
             opacity: 0;
 
             transition: opacity 0.15s ease;
         }
 
         /*
-         * Debug mode reveals the timer/status panel.
+         * "breeze" debug mode reveals the display.
          */
         .debug-mode #gesture-debug {
             opacity: 1;
@@ -331,9 +332,17 @@
         }
 
         @keyframes pulse-anim {
-            0% { transform: scale(0.88); }
-            50% { transform: scale(1.12); }
-            100% { transform: scale(0.88); }
+            0% {
+                transform: scale(0.88);
+            }
+
+            50% {
+                transform: scale(1.12);
+            }
+
+            100% {
+                transform: scale(0.88);
+            }
         }
 
         .logo-img {
@@ -412,7 +421,9 @@
 
         <div class="lock-box">
 
-            <h2>Private Access</h2>
+            <h2>
+                Private Access
+            </h2>
 
             <p>
                 Enter your access key to continue.
@@ -593,23 +604,39 @@
 
 
         const accessLock =
-            document.getElementById("access-lock");
+            document.getElementById(
+                "access-lock"
+            );
 
         const siteContent =
-            document.getElementById("site-content");
+            document.getElementById(
+                "site-content"
+            );
 
         const accessInput =
-            document.getElementById("access-key");
+            document.getElementById(
+                "access-key"
+            );
 
         const unlockButton =
-            document.getElementById("unlock-btn");
+            document.getElementById(
+                "unlock-btn"
+            );
 
         const errorMessage =
-            document.getElementById("error-message");
+            document.getElementById(
+                "error-message"
+            );
+
+
+        /* =========================
+           DEBUG ELEMENTS
+           ========================= */
 
         const gestureDebug =
-            document.getElementById("gesture-debug");
-
+            document.getElementById(
+                "gesture-debug"
+            );
 
         const zones =
             document.querySelectorAll(
@@ -618,10 +645,10 @@
 
 
         /* =========================
-           UNLOCK
+           UNLOCK SITE
            ========================= */
 
-        function unlockSite(debugMode = false) {
+        function unlockSite() {
 
             accessLock.style.display =
                 "none";
@@ -629,29 +656,18 @@
             siteContent.style.visibility =
                 "visible";
 
+            /*
+             * Keep debug mode exactly as it is.
+             * Normal unlocking does not show diagnostics.
+             */
+
             document.body.style.overflow =
                 "hidden";
-
-
-            if (debugMode) {
-
-                document.body.classList.add(
-                    "debug-mode"
-                );
-
-            } else {
-
-                document.body.classList.remove(
-                    "debug-mode"
-                );
-
-            }
-
         }
 
 
         /* =========================
-           PASSWORD / DEBUG KEY
+           PASSWORD / DEBUG INPUT
            ========================= */
 
         function checkPassword() {
@@ -661,25 +677,28 @@
 
 
             /*
-             * NORMAL ACCESS
+             * NORMAL ACCESS KEY
+             *
+             * This actually unlocks.
              */
 
             if (
                 enteredKey === ACCESS_KEY
             ) {
 
-                unlockSite(false);
+                unlockSite();
 
                 return;
             }
 
 
             /*
-             * DEBUG ACCESS
+             * DEBUG KEY
              *
-             * "breeze" unlocks the site
-             * AND reveals the gesture
-             * debugging controls.
+             * This DOES NOT unlock.
+             *
+             * It only reveals the
+             * diagnostic controls.
              */
 
             if (
@@ -687,14 +706,23 @@
                 DEBUG_KEY
             ) {
 
-                unlockSite(true);
+                document.body.classList.add(
+                    "debug-mode"
+                );
+
+                errorMessage.textContent =
+                    "DEBUG MODE ENABLED";
+
+                accessInput.value = "";
+
+                accessInput.focus();
 
                 return;
             }
 
 
             /*
-             * WRONG PASSWORD
+             * WRONG KEY
              */
 
             errorMessage.textContent =
@@ -739,7 +767,7 @@
            BR
            BR
            BL
-           
+
            3 SECOND LIMIT
            ========================= */
 
@@ -777,7 +805,7 @@
 
 
         /* =========================
-           SEQUENCE DISPLAY
+           UPDATE SEQUENCE DISPLAY
            ========================= */
 
         function updateSequenceDisplay() {
@@ -806,10 +834,12 @@
 
 
         /* =========================
-           RESET SEQUENCE
+           RESET GESTURE
            ========================= */
 
-        function resetSequence(message) {
+        function resetSequence(
+            message
+        ) {
 
             sequenceProgress = 0;
 
@@ -856,7 +886,7 @@
 
 
         /* =========================
-           TIMER
+           START TIMER
            ========================= */
 
         function startTimer() {
@@ -971,7 +1001,9 @@
            PROCESS GESTURE
            ========================= */
 
-        function processGesture(corner) {
+        function processGesture(
+            corner
+        ) {
 
             /*
              * FIRST TOUCH
@@ -1035,7 +1067,7 @@
 
 
             /*
-             * CHECK NEXT STEP
+             * GET EXPECTED NEXT CORNER
              */
 
             const expected =
@@ -1043,6 +1075,10 @@
                     sequenceProgress
                 ];
 
+
+            /*
+             * CORRECT CORNER
+             */
 
             if (
                 corner === expected
@@ -1063,7 +1099,7 @@
 
 
                 /*
-                 * COMPLETE
+                 * ENTIRE SEQUENCE COMPLETE
                  */
 
                 if (
@@ -1103,7 +1139,7 @@
                     setTimeout(
                         function() {
 
-                            unlockSite(false);
+                            unlockSite();
 
                         },
                         150
@@ -1112,6 +1148,10 @@
                 }
 
             } else {
+
+                /*
+                 * WRONG CORNER
+                 */
 
                 flashZone(
                     corner,
@@ -1140,7 +1180,6 @@
                     function(event) {
 
                         event.preventDefault();
-
                         event.stopPropagation();
 
 
@@ -1160,7 +1199,7 @@
 
 
         /* =========================
-           OUTSIDE TOUCH = RESET
+           TOUCH OUTSIDE ZONES
            ========================= */
 
         document.addEventListener(
@@ -1199,6 +1238,7 @@
 
             const now =
                 new Date();
+
 
             let h =
                 now.getHours();
@@ -1259,6 +1299,7 @@
 
             const now =
                 new Date();
+
 
             let targetHour =
                 now.getHours();
@@ -1337,7 +1378,6 @@
 
             let eh =
                 expiryDate.getHours();
-
 
             let em =
                 expiryDate.getMinutes();
