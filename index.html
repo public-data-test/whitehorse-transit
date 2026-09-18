@@ -3,24 +3,48 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+
     <title>Whitehorse Transit</title>
 
     <style>
+
         * {
             box-sizing: border-box;
+        }
+
+
+        /* =========================
+           PAGE
+           ========================= */
+
+        html {
+            width: 100%;
+            height: 100%;
         }
 
         body {
             margin: 0;
             padding: 0;
+
+            width: 100%;
+            min-height: 100vh;
+            min-height: 100dvh;
+
             background-color: #cccccc;
-            font-family: 'Arial Greek', Arial, Helvetica, sans-serif;
+
+            font-family:
+                'Arial Greek',
+                Arial,
+                Helvetica,
+                sans-serif;
+
             display: flex;
             justify-content: center;
             align-items: flex-end;
-            min-height: 100vh;
+
             overflow: hidden;
         }
+
 
         /* =========================
            ACCESS LOCK
@@ -28,84 +52,127 @@
 
         #access-lock {
             position: fixed;
+
             inset: 0;
+
             z-index: 99999;
+
             background: #ffffff;
+
             display: flex;
+
             justify-content: center;
+
             align-items: center;
+
             padding: 25px;
         }
 
+
         .lock-box {
             width: 100%;
+
             max-width: 360px;
+
             text-align: center;
         }
+
 
         .lock-box h2 {
             margin: 0 0 8px 0;
+
             font-size: 24px;
+
             color: #222;
         }
 
+
         .lock-box p {
             margin: 0 0 20px 0;
+
             font-size: 14px;
+
             color: #777;
         }
 
+
         #access-key {
             width: 100%;
+
             height: 50px;
+
             padding: 0 15px;
+
             border: 1px solid #ccc;
+
             border-radius: 8px;
+
             font-size: 16px;
+
             outline: none;
+
             text-align: center;
         }
+
 
         #access-key:focus {
             border-color: #00748b;
         }
 
+
         #unlock-btn {
             width: 100%;
+
             height: 50px;
+
             margin-top: 12px;
+
             border: none;
+
             border-radius: 8px;
+
             background: #00748b;
+
             color: white;
+
             font-size: 16px;
+
             font-weight: 700;
+
             cursor: pointer;
         }
+
 
         #unlock-btn:active {
             transform: scale(0.98);
         }
 
+
         #error-message {
             margin-top: 12px;
+
             color: #c62828;
+
             font-size: 14px;
+
             min-height: 18px;
         }
 
+
         /*
-         * Keeps the original site layout unchanged.
+         * Does not participate in the body's flex layout.
+         * This preserves the original page positioning.
          */
+
         #site-content {
             display: contents;
+
             visibility: hidden;
         }
 
 
         /* =========================
            GESTURE ZONES
-           INVISIBLE BY DEFAULT
            ========================= */
 
         .gesture-zone {
@@ -115,27 +182,38 @@
             height: 100px;
 
             background: #dddddd;
+
             border: 3px solid #555555;
+
             border-radius: 12px;
 
             z-index: 100001;
 
             display: flex;
+
             justify-content: center;
+
             align-items: center;
 
             color: #333333;
+
             font-size: 12px;
+
             font-weight: 700;
+
             text-align: center;
 
             user-select: none;
+
             -webkit-user-select: none;
+
             touch-action: none;
 
             /*
-             * Invisible, but still receives touches.
+             * Invisible during normal use,
+             * but still receives touches.
              */
+
             opacity: 0;
 
             transition:
@@ -145,46 +223,62 @@
                 transform 0.1s ease;
         }
 
+
         /*
-         * "breeze" debug mode reveals the zones.
+         * "breeze" reveals the diagnostic zones.
          */
+
         .debug-mode .gesture-zone {
             opacity: 1;
         }
 
+
         .gesture-zone.correct {
             background: #2e9b57;
+
             border-color: #1d6f3c;
+
             color: #ffffff;
         }
+
 
         .gesture-zone.wrong {
             background: #c62828;
+
             border-color: #8e1c1c;
+
             color: #ffffff;
         }
 
+
         .gesture-zone.active {
             background: #00748b;
+
             border-color: #005867;
+
             color: #ffffff;
+
             transform: scale(0.93);
         }
+
 
         #zone-tl {
             top: 10px;
             left: 10px;
         }
 
+
         #zone-tr {
             top: 10px;
             right: 10px;
         }
 
+
         #zone-bl {
             bottom: 10px;
             left: 10px;
         }
+
 
         #zone-br {
             bottom: 10px;
@@ -194,19 +288,23 @@
 
         /* =========================
            DEBUG DISPLAY
-           INVISIBLE BY DEFAULT
            ========================= */
 
         #gesture-debug {
             position: fixed;
+
             top: 125px;
+
             left: 50%;
+
             transform: translateX(-50%);
 
             width: 280px;
+
             padding: 14px;
 
             background: rgba(0, 0, 0, 0.08);
+
             border-radius: 10px;
 
             z-index: 100002;
@@ -220,30 +318,43 @@
             transition: opacity 0.15s ease;
         }
 
+
         /*
-         * "breeze" debug mode reveals the display.
+         * "breeze" reveals diagnostics.
          */
+
         .debug-mode #gesture-debug {
             opacity: 1;
         }
 
+
         #timer {
             font-family: monospace;
+
             font-size: 32px;
+
             font-weight: 700;
+
             color: #222;
         }
 
+
         #sequence-status {
             margin-top: 6px;
+
             font-size: 14px;
+
             color: #555;
         }
 
+
         #debug-message {
             margin-top: 5px;
+
             font-size: 12px;
+
             color: #777;
+
             min-height: 16px;
         }
 
@@ -254,84 +365,147 @@
 
         .app-card {
             width: 100%;
+
             max-width: 430px;
+
             height: 100vh;
+            height: 100dvh;
+
             background: #ffffff;
+
             border-top-left-radius: 12px;
+
             border-top-right-radius: 12px;
-            box-shadow: 0 -2px 20px rgba(0,0,0,0.08);
+
+            box-shadow:
+                0 -2px 20px rgba(0,0,0,0.08);
+
             display: flex;
+
             flex-direction: column;
+
             padding-top: 0px;
+
             position: relative;
+
+            /*
+             * Original desktop positioning.
+             */
             margin-top: -20px;
         }
 
+
         .content-wrapper {
             width: 100%;
+
             height: 100%;
+
             display: flex;
+
             flex-direction: column;
+
             align-items: center;
+
             padding: 20px;
+
             padding-bottom: 30px;
         }
 
+
         .header {
             position: absolute;
+
             top: 15px;
+
             left: 0;
+
             width: 100%;
+
             display: flex;
+
             justify-content: space-between;
+
             align-items: flex-start;
+
             padding: 0 20px;
         }
 
+
         .header-title h1 {
             margin: 0;
+
             font-size: 22px;
+
             font-weight: 700;
+
             color: #222;
         }
 
+
         .header-title p {
             margin: 2px 0 0 0;
+
             font-size: 14px;
+
             color: #666;
+
             font-weight: 400;
         }
 
+
         .close-btn {
             font-size: 22px;
+
             color: #333;
+
             cursor: pointer;
+
             line-height: 1;
         }
 
+
         .circle-wrapper {
             width: 200px;
+
             height: 200px;
+
             display: flex;
+
             justify-content: center;
+
             align-items: center;
+
             margin-top: 80px;
+
             margin-bottom: 15px;
+
             position: relative;
         }
 
+
         .pulse-ring {
             position: absolute;
+
             width: 190px;
+
             height: 190px;
+
             background-color: #00748b;
+
             border-radius: 50%;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-            animation: pulse-anim 2.0s infinite ease-in-out;
+
+            box-shadow:
+                0 2px 10px rgba(0,0,0,0.1);
+
+            animation:
+                pulse-anim 2.0s infinite ease-in-out;
+
             z-index: 1;
         }
 
+
         @keyframes pulse-anim {
+
             0% {
                 transform: scale(0.88);
             }
@@ -343,75 +517,161 @@
             100% {
                 transform: scale(0.88);
             }
+
         }
+
 
         .logo-img {
             position: relative;
+
             z-index: 2;
+
             width: 100px;
+
             height: 100px;
+
             border-radius: 50%;
+
             object-fit: cover;
+
             background: white;
+
             border: 4px solid white;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+
+            box-shadow:
+                0 2px 8px rgba(0,0,0,0.1);
         }
 
+
         .live-time {
-            font-family: 'Arial Greek', Arial, sans-serif;
+            font-family:
+                'Arial Greek',
+                Arial,
+                sans-serif;
+
             font-weight: 800;
+
             font-size: 56px;
+
             color: #333;
+
             margin: 10px 0 30px 0;
+
             letter-spacing: 0px;
-            font-variant-numeric: tabular-nums;
+
+            font-variant-numeric:
+                tabular-nums;
+
             text-align: center;
         }
 
+
         .youth-btn-img {
             width: 92%;
+
             max-width: 380px;
+
             height: auto;
+
             object-fit: contain;
+
             margin-bottom: 30px;
+
             display: block;
         }
 
+
         .info-card {
             width: 92%;
+
             max-width: 380px;
+
             background: #ffffff;
+
             border-radius: 8px;
+
             padding: 18px 18px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.12);
+
+            box-shadow:
+                0 4px 20px rgba(0,0,0,0.12);
+
             border: 1px solid #eaeaea;
+
             text-align: left;
         }
 
+
         .info-card h3 {
             margin: 0 0 4px 0;
+
             font-size: 20px;
+
             color: #222;
+
             font-weight: 500;
         }
 
+
         .info-card .sub {
             margin: 0 0 16px 0;
+
             font-size: 15px;
+
             color: #777;
+
             font-weight: 400;
         }
 
+
         .info-card .expiry {
-            font-family: 'Arial Greek', Arial, sans-serif;
+            font-family:
+                'Arial Greek',
+                Arial,
+                sans-serif;
+
             font-weight: 700;
+
             font-size: 15px;
+
             color: #444;
         }
+
+
+        /* =========================
+           MOBILE FIX
+           ========================= */
+
+        @media (max-width: 600px) {
+
+            body {
+                min-height: 100dvh;
+
+                height: 100dvh;
+            }
+
+
+            .app-card {
+                /*
+                 * The original -20px margin was
+                 * causing the mobile page to sit
+                 * too far upward.
+                 */
+
+                margin-top: 0;
+
+                height: 100dvh;
+
+                min-height: 100dvh;
+            }
+
+        }
+
     </style>
 </head>
 
+
 <body>
+
 
     <!-- =========================
          PASSWORD LOCK
@@ -459,6 +719,7 @@
         TOP LEFT
     </div>
 
+
     <div
         id="zone-tr"
         class="gesture-zone"
@@ -467,6 +728,7 @@
         TOP RIGHT
     </div>
 
+
     <div
         id="zone-bl"
         class="gesture-zone"
@@ -474,6 +736,7 @@
     >
         BOTTOM LEFT
     </div>
+
 
     <div
         id="zone-br"
@@ -527,6 +790,7 @@
 
                 </div>
 
+
                 <div class="close-btn">
                     ✕
                 </div>
@@ -570,9 +834,11 @@
                         Youth 10 Ride
                     </h3>
 
+
                     <div class="sub">
                         Whitehorse, YT
                     </div>
+
 
                     <div
                         class="expiry"
@@ -603,25 +869,33 @@
             "breeze";
 
 
+        /* =========================
+           ELEMENTS
+           ========================= */
+
         const accessLock =
             document.getElementById(
                 "access-lock"
             );
+
 
         const siteContent =
             document.getElementById(
                 "site-content"
             );
 
+
         const accessInput =
             document.getElementById(
                 "access-key"
             );
 
+
         const unlockButton =
             document.getElementById(
                 "unlock-btn"
             );
+
 
         const errorMessage =
             document.getElementById(
@@ -629,14 +903,11 @@
             );
 
 
-        /* =========================
-           DEBUG ELEMENTS
-           ========================= */
-
         const gestureDebug =
             document.getElementById(
                 "gesture-debug"
             );
+
 
         const zones =
             document.querySelectorAll(
@@ -644,22 +915,88 @@
             );
 
 
+        const timerDisplay =
+            document.getElementById(
+                "timer"
+            );
+
+
+        const sequenceStatus =
+            document.getElementById(
+                "sequence-status"
+            );
+
+
+        const debugMessage =
+            document.getElementById(
+                "debug-message"
+            );
+
+
         /* =========================
-           UNLOCK SITE
+           UNLOCK
            ========================= */
 
         function unlockSite() {
 
+            /*
+             * Hide security screen.
+             */
+
             accessLock.style.display =
                 "none";
+
+
+            /*
+             * Show actual site.
+             */
 
             siteContent.style.visibility =
                 "visible";
 
+
             /*
-             * Keep debug mode exactly as it is.
-             * Normal unlocking does not show diagnostics.
+             * VERY IMPORTANT:
+             * Always remove debug mode.
              */
+
+            document.body.classList.remove(
+                "debug-mode"
+            );
+
+
+            /*
+             * Completely disable
+             * gesture zones after
+             * unlocking.
+             */
+
+            zones.forEach(
+                function(zone) {
+
+                    zone.style.pointerEvents =
+                        "none";
+
+                }
+            );
+
+
+            /*
+             * Stop diagnostic timer.
+             */
+
+            if (
+                timerInterval !== null
+            ) {
+
+                clearInterval(
+                    timerInterval
+                );
+
+                timerInterval = null;
+
+            }
+
 
             document.body.style.overflow =
                 "hidden";
@@ -667,7 +1004,7 @@
 
 
         /* =========================
-           PASSWORD / DEBUG INPUT
+           PASSWORD
            ========================= */
 
         function checkPassword() {
@@ -677,9 +1014,7 @@
 
 
             /*
-             * NORMAL ACCESS KEY
-             *
-             * This actually unlocks.
+             * REAL ACCESS KEY
              */
 
             if (
@@ -695,10 +1030,7 @@
             /*
              * DEBUG KEY
              *
-             * This DOES NOT unlock.
-             *
-             * It only reveals the
-             * diagnostic controls.
+             * Does NOT unlock.
              */
 
             if (
@@ -710,8 +1042,10 @@
                     "debug-mode"
                 );
 
+
                 errorMessage.textContent =
                     "DEBUG MODE ENABLED";
+
 
                 accessInput.value = "";
 
@@ -727,6 +1061,7 @@
 
             errorMessage.textContent =
                 "Incorrect access key.";
+
 
             accessInput.value = "";
 
@@ -788,24 +1123,8 @@
         const timeout = 3000;
 
 
-        const timerDisplay =
-            document.getElementById(
-                "timer"
-            );
-
-        const sequenceStatus =
-            document.getElementById(
-                "sequence-status"
-            );
-
-        const debugMessage =
-            document.getElementById(
-                "debug-message"
-            );
-
-
         /* =========================
-           UPDATE SEQUENCE DISPLAY
+           SEQUENCE DISPLAY
            ========================= */
 
         function updateSequenceDisplay() {
@@ -834,7 +1153,7 @@
 
 
         /* =========================
-           RESET GESTURE
+           RESET
            ========================= */
 
         function resetSequence(
@@ -886,7 +1205,7 @@
 
 
         /* =========================
-           START TIMER
+           TIMER
            ========================= */
 
         function startTimer() {
@@ -1017,8 +1336,7 @@
                     corner === "TL"
                 ) {
 
-                    sequenceProgress =
-                        1;
+                    sequenceProgress = 1;
 
                     startTimer();
 
@@ -1067,7 +1385,7 @@
 
 
             /*
-             * GET EXPECTED NEXT CORNER
+             * NEXT EXPECTED CORNER
              */
 
             const expected =
@@ -1077,7 +1395,7 @@
 
 
             /*
-             * CORRECT CORNER
+             * CORRECT
              */
 
             if (
@@ -1099,7 +1417,7 @@
 
 
                 /*
-                 * ENTIRE SEQUENCE COMPLETE
+                 * COMPLETE
                  */
 
                 if (
@@ -1150,7 +1468,7 @@
             } else {
 
                 /*
-                 * WRONG CORNER
+                 * WRONG
                  */
 
                 flashZone(
@@ -1169,7 +1487,7 @@
 
 
         /* =========================
-           GESTURE ZONE EVENTS
+           GESTURE EVENTS
            ========================= */
 
         zones.forEach(
@@ -1180,6 +1498,7 @@
                     function(event) {
 
                         event.preventDefault();
+
                         event.stopPropagation();
 
 
@@ -1199,7 +1518,7 @@
 
 
         /* =========================
-           TOUCH OUTSIDE ZONES
+           OUTSIDE TOUCH
            ========================= */
 
         document.addEventListener(
@@ -1209,7 +1528,9 @@
                 if (
                     sequenceProgress === 0
                 ) {
+
                     return;
+
                 }
 
 
@@ -1218,7 +1539,9 @@
                         ".gesture-zone"
                     )
                 ) {
+
                     return;
+
                 }
 
 
@@ -1378,6 +1701,7 @@
 
             let eh =
                 expiryDate.getHours();
+
 
             let em =
                 expiryDate.getMinutes();
