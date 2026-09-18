@@ -92,7 +92,13 @@
             min-height: 18px;
         }
 
+        /*
+         * IMPORTANT:
+         * display: contents prevents this wrapper
+         * from changing the original page layout.
+         */
         #site-content {
+            display: contents;
             visibility: hidden;
         }
 
@@ -306,6 +312,7 @@
                 <div class="info-card">
                     <h3>Youth 10 Ride</h3>
                     <div class="sub">Whitehorse, YT</div>
+
                     <div class="expiry" id="expiry-text">
                         Expires Oct 24, 2024 at 11:37 PM
                     </div>
@@ -317,6 +324,7 @@
     </div>
 
     <script>
+
         /* =========================
            ACCESS KEY
            ========================= */
@@ -329,27 +337,221 @@
         const unlockButton = document.getElementById("unlock-btn");
         const errorMessage = document.getElementById("error-message");
 
+
+        /* =========================
+           UNLOCK FUNCTION
+           ========================= */
+
         function unlockSite() {
+            accessLock.style.display = "none";
+            siteContent.style.visibility = "visible";
+            document.body.style.overflow = "hidden";
+        }
+
+
+        /* =========================
+           PASSWORD UNLOCK
+           ========================= */
+
+        function checkPassword() {
+
             if (accessInput.value === ACCESS_KEY) {
-                accessLock.style.display = "none";
-                siteContent.style.visibility = "visible";
-                document.body.style.overflow = "hidden";
+
+                unlockSite();
+
             } else {
+
                 errorMessage.textContent = "Incorrect access key.";
                 accessInput.value = "";
                 accessInput.focus();
+
             }
         }
 
-        unlockButton.addEventListener("click", unlockSite);
+        unlockButton.addEventListener("click", checkPassword);
 
         accessInput.addEventListener("keydown", function(event) {
+
             if (event.key === "Enter") {
-                unlockSite();
+                checkPassword();
             }
+
         });
 
         accessInput.focus();
+
+
+        /* =========================
+           SECRET CORNER SEQUENCE
+           
+           TOP LEFT
+           BOTTOM RIGHT
+           BOTTOM RIGHT
+           BOTTOM LEFT
+
+           Must finish within 3 seconds.
+           Any touch/click elsewhere resets.
+           ========================= */
+
+        const secretSequence = [
+            "TL",
+            "BR",
+            "BR",
+            "BL"
+        ];
+
+        let sequenceProgress = 0;
+        let sequenceStartTime = null;
+
+        const CORNER_SIZE = 100;
+        const SEQUENCE_TIMEOUT = 3000;
+
+
+        function getCorner(x, y) {
+
+            const width = window.innerWidth;
+            const height = window.innerHeight;
+
+            const isLeft = x <= CORNER_SIZE;
+            const isRight = x >= width - CORNER_SIZE;
+
+            const isTop = y <= CORNER_SIZE;
+            const isBottom = y >= height - CORNER_SIZE;
+
+
+            if (isTop && isLeft) {
+                return "TL";
+            }
+
+            if (isTop && isRight) {
+                return "TR";
+            }
+
+            if (isBottom && isRight) {
+                return "BR";
+            }
+
+            if (isBottom && isLeft) {
+                return "BL";
+            }
+
+            return null;
+        }
+
+
+        document.addEventListener("pointerdown", function(event) {
+
+            /*
+             * Don't process the gesture after the site
+             * has already been unlocked.
+             */
+            if (accessLock.style.display === "none") {
+                return;
+            }
+
+
+            const corner = getCorner(
+                event.clientX,
+                event.clientY
+            );
+
+
+            /*
+             * First tap must be top-left.
+             */
+            if (sequenceProgress === 0) {
+
+                if (corner === "TL") {
+
+                    sequenceProgress = 1;
+                    sequenceStartTime = Date.now();
+
+                }
+
+                return;
+            }
+
+
+            /*
+             * Check the 3-second limit.
+             */
+            if (Date.now() - sequenceStartTime > SEQUENCE_TIMEOUT) {
+
+                sequenceProgress = 0;
+                sequenceStartTime = null;
+
+                /*
+                 * This same tap can start a new sequence
+                 * if it happens to be top-left.
+                 */
+                if (corner === "TL") {
+
+                    sequenceProgress = 1;
+                    sequenceStartTime = Date.now();
+
+                }
+
+                return;
+            }
+
+
+            /*
+             * Any touch/click outside a corner
+             * immediately resets the sequence.
+             */
+            if (corner === null) {
+
+                sequenceProgress = 0;
+                sequenceStartTime = null;
+
+                return;
+            }
+
+
+            /*
+             * Check whether this is the correct
+             * next corner.
+             */
+            if (corner === secretSequence[sequenceProgress]) {
+
+                sequenceProgress++;
+
+
+                /*
+                 * Entire sequence completed.
+                 */
+                if (sequenceProgress === secretSequence.length) {
+
+                    sequenceProgress = 0;
+                    sequenceStartTime = null;
+
+                    unlockSite();
+
+                }
+
+            } else {
+
+                /*
+                 * Wrong corner resets everything.
+                 */
+                sequenceProgress = 0;
+                sequenceStartTime = null;
+
+
+                /*
+                 * If the wrong tap itself was top-left,
+                 * treat it as the beginning of a new sequence.
+                 */
+                if (corner === "TL") {
+
+                    sequenceProgress = 1;
+                    sequenceStartTime = Date.now();
+
+                }
+
+            }
+
+        });
 
 
         /* =========================
@@ -357,6 +559,7 @@
            ========================= */
 
         function updateClock() {
+
             const now = new Date();
 
             let h = now.getHours();
@@ -366,6 +569,7 @@
             const ampm = h >= 12 ? 'PM' : 'AM';
 
             h = h % 12 || 12;
+
             m = String(m).padStart(2, '0');
             s = String(s).padStart(2, '0');
 
@@ -374,6 +578,7 @@
         }
 
         updateClock();
+
         setInterval(updateClock, 1000);
 
 
@@ -382,20 +587,25 @@
            ========================= */
 
         function updateExpiry() {
+
             const now = new Date();
 
             let targetHour = now.getHours();
             let targetMinute = now.getMinutes();
 
             if (targetMinute < 15) {
+
                 targetMinute = 0;
 
                 if (now.getMinutes() < 15) {
                     targetHour += 1;
                 }
+
             } else {
+
                 targetMinute = 0;
                 targetHour += 1;
+
             }
 
             if (targetHour >= 24) {
@@ -412,9 +622,18 @@
             );
 
             const months = [
-                'Jan', 'Feb', 'Mar', 'Apr',
-                'May', 'Jun', 'Jul', 'Aug',
-                'Sep', 'Oct', 'Nov', 'Dec'
+                'Jan',
+                'Feb',
+                'Mar',
+                'Apr',
+                'May',
+                'Jun',
+                'Jul',
+                'Aug',
+                'Sep',
+                'Oct',
+                'Nov',
+                'Dec'
             ];
 
             const month = months[expiryDate.getMonth()];
@@ -434,7 +653,9 @@
         }
 
         updateExpiry();
+
         setInterval(updateExpiry, 60000);
+
     </script>
 
 </body>
