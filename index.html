@@ -4,12 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Whitehorse Transit</title>
+
     <style>
         * { box-sizing: border-box; }
+
         body {
             margin: 0;
             padding: 0;
-            background-color: #cccccc; 
+            background-color: #cccccc;
             font-family: 'Arial Greek', Arial, Helvetica, sans-serif;
             display: flex;
             justify-content: center;
@@ -17,6 +19,86 @@
             min-height: 100vh;
             overflow: hidden;
         }
+
+        /* =========================
+           ACCESS LOCK
+           ========================= */
+
+        #access-lock {
+            position: fixed;
+            inset: 0;
+            z-index: 99999;
+            background: #ffffff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 25px;
+        }
+
+        .lock-box {
+            width: 100%;
+            max-width: 360px;
+            text-align: center;
+        }
+
+        .lock-box h2 {
+            margin: 0 0 8px 0;
+            font-size: 24px;
+            color: #222;
+        }
+
+        .lock-box p {
+            margin: 0 0 20px 0;
+            font-size: 14px;
+            color: #777;
+        }
+
+        #access-key {
+            width: 100%;
+            height: 50px;
+            padding: 0 15px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            font-size: 16px;
+            outline: none;
+            text-align: center;
+        }
+
+        #access-key:focus {
+            border-color: #00748b;
+        }
+
+        #unlock-btn {
+            width: 100%;
+            height: 50px;
+            margin-top: 12px;
+            border: none;
+            border-radius: 8px;
+            background: #00748b;
+            color: white;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        #unlock-btn:active {
+            transform: scale(0.98);
+        }
+
+        #error-message {
+            margin-top: 12px;
+            color: #c62828;
+            font-size: 14px;
+            min-height: 18px;
+        }
+
+        #site-content {
+            visibility: hidden;
+        }
+
+        /* =========================
+           ORIGINAL SITE
+           ========================= */
 
         .app-card {
             width: 100%;
@@ -28,12 +110,11 @@
             box-shadow: 0 -2px 20px rgba(0,0,0,0.08);
             display: flex;
             flex-direction: column;
-            padding-top: 0px; 
+            padding-top: 0px;
             position: relative;
             margin-top: -20px;
         }
 
-        /* CHANGED: Pushed everything up from the top  */
         .content-wrapper {
             width: 100%;
             height: 100%;
@@ -41,7 +122,7 @@
             flex-direction: column;
             align-items: center;
             padding: 20px;
-            padding-bottom: 30px; /* Tightened the bottom spacing */
+            padding-bottom: 30px;
         }
 
         .header {
@@ -54,18 +135,21 @@
             align-items: flex-start;
             padding: 0 20px;
         }
+
         .header-title h1 {
             margin: 0;
             font-size: 22px;
             font-weight: 700;
             color: #222;
         }
+
         .header-title p {
             margin: 2px 0 0 0;
             font-size: 14px;
             color: #666;
             font-weight: 400;
         }
+
         .close-btn {
             font-size: 22px;
             color: #333;
@@ -79,10 +163,11 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            margin-top: 80px; /* PUSHED THE WHOLE STACK UP WITH THIS SPACER */
+            margin-top: 80px;
             margin-bottom: 15px;
             position: relative;
         }
+
         .pulse-ring {
             position: absolute;
             width: 190px;
@@ -93,6 +178,7 @@
             animation: pulse-anim 2.0s infinite ease-in-out;
             z-index: 1;
         }
+
         @keyframes pulse-anim {
             0% { transform: scale(0.88); }
             50% { transform: scale(1.12); }
@@ -141,18 +227,21 @@
             border: 1px solid #eaeaea;
             text-align: left;
         }
+
         .info-card h3 {
             margin: 0 0 4px 0;
             font-size: 20px;
             color: #222;
             font-weight: 500;
         }
+
         .info-card .sub {
             margin: 0 0 16px 0;
             font-size: 15px;
             color: #777;
             font-weight: 400;
         }
+
         .info-card .expiry {
             font-family: 'Arial Greek', Arial, sans-serif;
             font-weight: 700;
@@ -161,83 +250,189 @@
         }
     </style>
 </head>
+
 <body>
 
-    <div class="app-card">
-        
-        <div class="header">
-            <div class="header-title">
-                <h1>Whitehorse Transit</h1>
-                <p>Show operator your ticket</p>
-            </div>
-            <div class="close-btn">✕</div>
-        </div>
+    <!-- =========================
+         PASSWORD SCREEN
+         ========================= -->
 
-        <div class="content-wrapper">
-            
-            <div class="circle-wrapper">
-                <div class="pulse-ring"></div>
-                <img class="logo-img" src="logo.jpg" alt="Whitehorse Logo">
-            </div>
+    <div id="access-lock">
+        <div class="lock-box">
+            <h2>Private Access</h2>
+            <p>Enter your access key to continue.</p>
 
-            <div class="live-time" id="clock">10:37:44 PM</div>
+            <input
+                type="password"
+                id="access-key"
+                placeholder="Access key"
+                autocomplete="off"
+            >
 
-            <img class="youth-btn-img" src="button.jpg" alt="Youth Button">
+            <button id="unlock-btn">Unlock</button>
 
-            <div class="info-card">
-                <h3>Youth 10 Ride</h3>
-                <div class="sub">Whitehorse, YT</div>
-                <div class="expiry" id="expiry-text">Expires Oct 24, 2024 at 11:37 PM</div>
-            </div>
-            
+            <div id="error-message"></div>
         </div>
     </div>
 
+    <!-- =========================
+         ACTUAL SITE
+         ========================= -->
+
+    <div id="site-content">
+
+        <div class="app-card">
+
+            <div class="header">
+                <div class="header-title">
+                    <h1>Whitehorse Transit</h1>
+                    <p>Show operator your ticket</p>
+                </div>
+
+                <div class="close-btn">✕</div>
+            </div>
+
+            <div class="content-wrapper">
+
+                <div class="circle-wrapper">
+                    <div class="pulse-ring"></div>
+                    <img class="logo-img" src="logo.jpg" alt="Whitehorse Logo">
+                </div>
+
+                <div class="live-time" id="clock">10:37:44 PM</div>
+
+                <img class="youth-btn-img" src="button.jpg" alt="Youth Button">
+
+                <div class="info-card">
+                    <h3>Youth 10 Ride</h3>
+                    <div class="sub">Whitehorse, YT</div>
+                    <div class="expiry" id="expiry-text">
+                        Expires Oct 24, 2024 at 11:37 PM
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+
     <script>
+        /* =========================
+           ACCESS KEY
+           ========================= */
+
+        const ACCESS_KEY = "-PAuR*&ocLo0aVuW$@hAN4Zx=NaSYSRw";
+
+        const accessLock = document.getElementById("access-lock");
+        const siteContent = document.getElementById("site-content");
+        const accessInput = document.getElementById("access-key");
+        const unlockButton = document.getElementById("unlock-btn");
+        const errorMessage = document.getElementById("error-message");
+
+        function unlockSite() {
+            if (accessInput.value === ACCESS_KEY) {
+                accessLock.style.display = "none";
+                siteContent.style.visibility = "visible";
+                document.body.style.overflow = "hidden";
+            } else {
+                errorMessage.textContent = "Incorrect access key.";
+                accessInput.value = "";
+                accessInput.focus();
+            }
+        }
+
+        unlockButton.addEventListener("click", unlockSite);
+
+        accessInput.addEventListener("keydown", function(event) {
+            if (event.key === "Enter") {
+                unlockSite();
+            }
+        });
+
+        accessInput.focus();
+
+
+        /* =========================
+           CLOCK
+           ========================= */
+
         function updateClock() {
             const now = new Date();
+
             let h = now.getHours();
             let m = now.getMinutes();
             let s = now.getSeconds();
+
             const ampm = h >= 12 ? 'PM' : 'AM';
+
             h = h % 12 || 12;
             m = String(m).padStart(2, '0');
             s = String(s).padStart(2, '0');
-            document.getElementById('clock').textContent = `${h}:${m}:${s} ${ampm}`;
+
+            document.getElementById('clock').textContent =
+                `${h}:${m}:${s} ${ampm}`;
         }
+
         updateClock();
         setInterval(updateClock, 1000);
 
+
+        /* =========================
+           EXPIRY
+           ========================= */
+
         function updateExpiry() {
             const now = new Date();
+
             let targetHour = now.getHours();
             let targetMinute = now.getMinutes();
 
             if (targetMinute < 15) {
                 targetMinute = 0;
-                if (now.getMinutes() < 15) targetHour += 1;
+
+                if (now.getMinutes() < 15) {
+                    targetHour += 1;
+                }
             } else {
                 targetMinute = 0;
                 targetHour += 1;
             }
-            if (targetHour >= 24) targetHour = 0;
+
+            if (targetHour >= 24) {
+                targetHour = 0;
+            }
 
             const expiryDate = new Date(now);
-            expiryDate.setHours(targetHour, targetMinute, 0, 0);
 
-            const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+            expiryDate.setHours(
+                targetHour,
+                targetMinute,
+                0,
+                0
+            );
+
+            const months = [
+                'Jan', 'Feb', 'Mar', 'Apr',
+                'May', 'Jun', 'Jul', 'Aug',
+                'Sep', 'Oct', 'Nov', 'Dec'
+            ];
+
             const month = months[expiryDate.getMonth()];
             const day = expiryDate.getDate();
             const year = expiryDate.getFullYear();
 
             let eh = expiryDate.getHours();
             let em = expiryDate.getMinutes();
+
             const eampm = eh >= 12 ? 'PM' : 'AM';
+
             eh = eh % 12 || 12;
             em = String(em).padStart(2, '0');
 
-            document.getElementById('expiry-text').textContent = `Expires ${month} ${day}, ${year} at ${eh}:${em} ${eampm}`;
+            document.getElementById('expiry-text').textContent =
+                `Expires ${month} ${day}, ${year} at ${eh}:${em} ${eampm}`;
         }
+
         updateExpiry();
         setInterval(updateExpiry, 60000);
     </script>
