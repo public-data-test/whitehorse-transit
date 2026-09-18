@@ -92,7 +92,7 @@
             min-height: 18px;
         }
 
-        /* Preserve original layout */
+        /* Preserve original page layout */
         #site-content {
             display: contents;
             visibility: hidden;
@@ -100,7 +100,8 @@
 
 
         /* =========================
-           DEBUG GESTURE ZONES
+           GESTURE ZONES
+           INVISIBLE BY DEFAULT
            ========================= */
 
         .gesture-zone {
@@ -122,18 +123,29 @@
             color: #333333;
             font-size: 12px;
             font-weight: 700;
-
             text-align: center;
 
             user-select: none;
             -webkit-user-select: none;
-
             touch-action: none;
 
+            /*
+             * INVISIBLE, BUT STILL CLICKABLE
+             */
+            opacity: 0;
+
             transition:
+                opacity 0.15s ease,
                 background-color 0.1s ease,
                 border-color 0.1s ease,
                 transform 0.1s ease;
+        }
+
+        /*
+         * Debug mode makes them visible.
+         */
+        .debug-mode .gesture-zone {
+            opacity: 1;
         }
 
         .gesture-zone.correct {
@@ -177,7 +189,8 @@
 
 
         /* =========================
-           DEBUG TIMER
+           DEBUG DISPLAY
+           INVISIBLE BY DEFAULT
            ========================= */
 
         #gesture-debug {
@@ -187,10 +200,9 @@
             transform: translateX(-50%);
 
             width: 280px;
-
             padding: 14px;
 
-            background: rgba(0,0,0,0.08);
+            background: rgba(0, 0, 0, 0.08);
             border-radius: 10px;
 
             z-index: 100002;
@@ -198,6 +210,20 @@
             text-align: center;
 
             pointer-events: none;
+
+            /*
+             * INVISIBLE BY DEFAULT
+             */
+            opacity: 0;
+
+            transition: opacity 0.15s ease;
+        }
+
+        /*
+         * Debug mode reveals the timer/status panel.
+         */
+        .debug-mode #gesture-debug {
+            opacity: 1;
         }
 
         #timer {
@@ -411,7 +437,7 @@
 
 
     <!-- =========================
-         GESTURE DEBUG CONTROLS
+         GESTURE ZONES
          ========================= -->
 
     <div
@@ -422,7 +448,6 @@
         TOP LEFT
     </div>
 
-
     <div
         id="zone-tr"
         class="gesture-zone"
@@ -431,7 +456,6 @@
         TOP RIGHT
     </div>
 
-
     <div
         id="zone-bl"
         class="gesture-zone"
@@ -439,7 +463,6 @@
     >
         BOTTOM LEFT
     </div>
-
 
     <div
         id="zone-br"
@@ -559,11 +582,14 @@
     <script>
 
         /* =========================
-           PASSWORD
+           ACCESS SETTINGS
            ========================= */
 
         const ACCESS_KEY =
             "-PAuR*&ocLo0aVuW$@hAN4Zx=NaSYSRw";
+
+        const DEBUG_KEY =
+            "breeze";
 
 
         const accessLock =
@@ -581,55 +607,102 @@
         const errorMessage =
             document.getElementById("error-message");
 
-
         const gestureDebug =
             document.getElementById("gesture-debug");
 
 
         const zones =
-            document.querySelectorAll(".gesture-zone");
+            document.querySelectorAll(
+                ".gesture-zone"
+            );
 
 
         /* =========================
            UNLOCK
            ========================= */
 
-        function unlockSite() {
+        function unlockSite(debugMode = false) {
 
-            accessLock.style.display = "none";
+            accessLock.style.display =
+                "none";
 
-            siteContent.style.visibility = "visible";
+            siteContent.style.visibility =
+                "visible";
 
-            zones.forEach(function(zone) {
-                zone.style.display = "none";
-            });
+            document.body.style.overflow =
+                "hidden";
 
-            gestureDebug.style.display = "none";
 
-            document.body.style.overflow = "hidden";
+            if (debugMode) {
+
+                document.body.classList.add(
+                    "debug-mode"
+                );
+
+            } else {
+
+                document.body.classList.remove(
+                    "debug-mode"
+                );
+
+            }
+
         }
 
 
         /* =========================
-           PASSWORD CHECK
+           PASSWORD / DEBUG KEY
            ========================= */
 
         function checkPassword() {
 
-            if (accessInput.value === ACCESS_KEY) {
+            const enteredKey =
+                accessInput.value;
 
-                unlockSite();
 
-            } else {
+            /*
+             * NORMAL ACCESS
+             */
 
-                errorMessage.textContent =
-                    "Incorrect access key.";
+            if (
+                enteredKey === ACCESS_KEY
+            ) {
 
-                accessInput.value = "";
+                unlockSite(false);
 
-                accessInput.focus();
-
+                return;
             }
+
+
+            /*
+             * DEBUG ACCESS
+             *
+             * "breeze" unlocks the site
+             * AND reveals the gesture
+             * debugging controls.
+             */
+
+            if (
+                enteredKey.toLowerCase() ===
+                DEBUG_KEY
+            ) {
+
+                unlockSite(true);
+
+                return;
+            }
+
+
+            /*
+             * WRONG PASSWORD
+             */
+
+            errorMessage.textContent =
+                "Incorrect access key.";
+
+            accessInput.value = "";
+
+            accessInput.focus();
 
         }
 
@@ -644,8 +717,12 @@
             "keydown",
             function(event) {
 
-                if (event.key === "Enter") {
+                if (
+                    event.key === "Enter"
+                ) {
+
                     checkPassword();
+
                 }
 
             }
@@ -656,7 +733,14 @@
 
 
         /* =========================
-           GESTURE SEQUENCE
+           SECRET GESTURE
+           
+           TL
+           BR
+           BR
+           BL
+           
+           3 SECOND LIMIT
            ========================= */
 
         const secretSequence = [
@@ -677,18 +761,30 @@
 
 
         const timerDisplay =
-            document.getElementById("timer");
+            document.getElementById(
+                "timer"
+            );
 
         const sequenceStatus =
-            document.getElementById("sequence-status");
+            document.getElementById(
+                "sequence-status"
+            );
 
         const debugMessage =
-            document.getElementById("debug-message");
+            document.getElementById(
+                "debug-message"
+            );
 
+
+        /* =========================
+           SEQUENCE DISPLAY
+           ========================= */
 
         function updateSequenceDisplay() {
 
-            if (sequenceProgress === 0) {
+            if (
+                sequenceProgress === 0
+            ) {
 
                 sequenceStatus.textContent =
                     "Sequence: —";
@@ -709,6 +805,10 @@
         }
 
 
+        /* =========================
+           RESET SEQUENCE
+           ========================= */
+
         function resetSequence(message) {
 
             sequenceProgress = 0;
@@ -716,9 +816,13 @@
             sequenceStartTime = null;
 
 
-            if (timerInterval !== null) {
+            if (
+                timerInterval !== null
+            ) {
 
-                clearInterval(timerInterval);
+                clearInterval(
+                    timerInterval
+                );
 
                 timerInterval = null;
 
@@ -736,18 +840,24 @@
                 message;
 
 
-            zones.forEach(function(zone) {
+            zones.forEach(
+                function(zone) {
 
-                zone.classList.remove(
-                    "correct",
-                    "wrong",
-                    "active"
-                );
+                    zone.classList.remove(
+                        "correct",
+                        "wrong",
+                        "active"
+                    );
 
-            });
+                }
+            );
 
         }
 
+
+        /* =========================
+           TIMER
+           ========================= */
 
         function startTimer() {
 
@@ -759,9 +869,13 @@
                 "3.00";
 
 
-            if (timerInterval !== null) {
+            if (
+                timerInterval !== null
+            ) {
 
-                clearInterval(timerInterval);
+                clearInterval(
+                    timerInterval
+                );
 
             }
 
@@ -807,6 +921,10 @@
         }
 
 
+        /* =========================
+           FLASH ZONE
+           ========================= */
+
         function flashZone(
             corner,
             className
@@ -849,17 +967,26 @@
         }
 
 
+        /* =========================
+           PROCESS GESTURE
+           ========================= */
+
         function processGesture(corner) {
 
-            /* FIRST TOUCH */
+            /*
+             * FIRST TOUCH
+             */
 
             if (
                 sequenceProgress === 0
             ) {
 
-                if (corner === "TL") {
+                if (
+                    corner === "TL"
+                ) {
 
-                    sequenceProgress = 1;
+                    sequenceProgress =
+                        1;
 
                     startTimer();
 
@@ -889,7 +1016,9 @@
             }
 
 
-            /* CHECK TIMER */
+            /*
+             * CHECK TIMER
+             */
 
             if (
                 Date.now() -
@@ -905,7 +1034,9 @@
             }
 
 
-            /* CHECK NEXT STEP */
+            /*
+             * CHECK NEXT STEP
+             */
 
             const expected =
                 secretSequence[
@@ -913,7 +1044,9 @@
                 ];
 
 
-            if (corner === expected) {
+            if (
+                corner === expected
+            ) {
 
                 sequenceProgress++;
 
@@ -923,14 +1056,15 @@
                     corner +
                     " accepted.";
 
-
                 flashZone(
                     corner,
                     "correct"
                 );
 
 
-                /* COMPLETE */
+                /*
+                 * COMPLETE
+                 */
 
                 if (
                     sequenceProgress ===
@@ -967,7 +1101,11 @@
 
 
                     setTimeout(
-                        unlockSite,
+                        function() {
+
+                            unlockSite(false);
+
+                        },
                         150
                     );
 
@@ -994,28 +1132,31 @@
            GESTURE ZONE EVENTS
            ========================= */
 
-        zones.forEach(function(zone) {
+        zones.forEach(
+            function(zone) {
 
-            zone.addEventListener(
-                "pointerdown",
-                function(event) {
+                zone.addEventListener(
+                    "pointerdown",
+                    function(event) {
 
-                    event.preventDefault();
-                    event.stopPropagation();
+                        event.preventDefault();
 
-
-                    const corner =
-                        zone.dataset.corner;
+                        event.stopPropagation();
 
 
-                    processGesture(
-                        corner
-                    );
+                        const corner =
+                            zone.dataset.corner;
 
-                }
-            );
 
-        });
+                        processGesture(
+                            corner
+                        );
+
+                    }
+                );
+
+            }
+        );
 
 
         /* =========================
@@ -1056,13 +1197,18 @@
 
         function updateClock() {
 
-            const now = new Date();
+            const now =
+                new Date();
 
-            let h = now.getHours();
+            let h =
+                now.getHours();
 
-            let m = now.getMinutes();
+            let m =
+                now.getMinutes();
 
-            let s = now.getSeconds();
+            let s =
+                now.getSeconds();
+
 
             const ampm =
                 h >= 12
@@ -1111,7 +1257,8 @@
 
         function updateExpiry() {
 
-            const now = new Date();
+            const now =
+                new Date();
 
             let targetHour =
                 now.getHours();
