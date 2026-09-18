@@ -93,14 +93,127 @@
         }
 
         /*
-         * IMPORTANT:
-         * display: contents prevents this wrapper
-         * from changing the original page layout.
+         * Keeps the original site's layout unchanged.
          */
         #site-content {
             display: contents;
             visibility: hidden;
         }
+
+
+        /* =========================
+           GESTURE DEBUG DISPLAY
+           ========================= */
+
+        .gesture-zone {
+            position: fixed;
+            width: 100px;
+            height: 100px;
+            background: #dddddd;
+            border: 3px solid #888888;
+            border-radius: 12px;
+            z-index: 100001;
+
+            display: flex;
+            justify-content: center;
+            align-items: center;
+
+            color: #555555;
+            font-size: 12px;
+            font-weight: 700;
+            text-align: center;
+
+            user-select: none;
+            -webkit-user-select: none;
+            touch-action: none;
+
+            transition:
+                background-color 0.1s ease,
+                border-color 0.1s ease,
+                transform 0.1s ease;
+        }
+
+        .gesture-zone.active {
+            background: #00748b;
+            border-color: #005867;
+            color: #ffffff;
+            transform: scale(0.93);
+        }
+
+        .gesture-zone.correct {
+            background: #2e9b57;
+            border-color: #1d6f3c;
+            color: #ffffff;
+        }
+
+        .gesture-zone.wrong {
+            background: #c62828;
+            border-color: #8e1c1c;
+            color: #ffffff;
+        }
+
+        #zone-tl {
+            top: 10px;
+            left: 10px;
+        }
+
+        #zone-br {
+            right: 10px;
+            bottom: 10px;
+        }
+
+        #zone-bl {
+            left: 10px;
+            bottom: 10px;
+        }
+
+        #zone-tr {
+            top: 10px;
+            right: 10px;
+        }
+
+        /*
+         * Debug information
+         */
+        #gesture-debug {
+            position: fixed;
+            top: 125px;
+            left: 50%;
+            transform: translateX(-50%);
+
+            width: 280px;
+            padding: 14px;
+            border-radius: 10px;
+
+            background: rgba(0, 0, 0, 0.08);
+
+            text-align: center;
+
+            z-index: 100002;
+
+            pointer-events: none;
+        }
+
+        #timer {
+            font-family: monospace;
+            font-size: 32px;
+            font-weight: 700;
+            color: #222;
+        }
+
+        #sequence-status {
+            margin-top: 6px;
+            font-size: 14px;
+            color: #555;
+        }
+
+        #debug-message {
+            margin-top: 5px;
+            font-size: 12px;
+            color: #777;
+            min-height: 16px;
+        }
+
 
         /* =========================
            ORIGINAL SITE
@@ -264,8 +377,11 @@
          ========================= -->
 
     <div id="access-lock">
+
         <div class="lock-box">
+
             <h2>Private Access</h2>
+
             <p>Enter your access key to continue.</p>
 
             <input
@@ -275,11 +391,74 @@
                 autocomplete="off"
             >
 
-            <button id="unlock-btn">Unlock</button>
+            <button id="unlock-btn">
+                Unlock
+            </button>
 
             <div id="error-message"></div>
+
         </div>
+
+
+        <!-- =========================
+             VISIBLE GESTURE ZONES
+             ========================= -->
+
+        <div
+            id="zone-tl"
+            class="gesture-zone"
+            data-corner="TL"
+        >
+            TOP LEFT
+        </div>
+
+        <div
+            id="zone-tr"
+            class="gesture-zone"
+            data-corner="TR"
+        >
+            TOP RIGHT
+        </div>
+
+        <div
+            id="zone-bl"
+            class="gesture-zone"
+            data-corner="BL"
+        >
+            BOTTOM LEFT
+        </div>
+
+        <div
+            id="zone-br"
+            class="gesture-zone"
+            data-corner="BR"
+        >
+            BOTTOM RIGHT
+        </div>
+
+
+        <!-- =========================
+             GESTURE DEBUG INFO
+             ========================= -->
+
+        <div id="gesture-debug">
+
+            <div id="timer">
+                0.00
+            </div>
+
+            <div id="sequence-status">
+                Sequence: —
+            </div>
+
+            <div id="debug-message">
+                Waiting for first touch...
+            </div>
+
+        </div>
+
     </div>
+
 
     <!-- =========================
          ACTUAL SITE
@@ -290,38 +469,81 @@
         <div class="app-card">
 
             <div class="header">
+
                 <div class="header-title">
-                    <h1>Whitehorse Transit</h1>
-                    <p>Show operator your ticket</p>
+
+                    <h1>
+                        Whitehorse Transit
+                    </h1>
+
+                    <p>
+                        Show operator your ticket
+                    </p>
+
                 </div>
 
-                <div class="close-btn">✕</div>
+                <div class="close-btn">
+                    ✕
+                </div>
+
             </div>
+
 
             <div class="content-wrapper">
 
                 <div class="circle-wrapper">
+
                     <div class="pulse-ring"></div>
-                    <img class="logo-img" src="logo.jpg" alt="Whitehorse Logo">
+
+                    <img
+                        class="logo-img"
+                        src="logo.jpg"
+                        alt="Whitehorse Logo"
+                    >
+
                 </div>
 
-                <div class="live-time" id="clock">10:37:44 PM</div>
 
-                <img class="youth-btn-img" src="button.jpg" alt="Youth Button">
+                <div
+                    class="live-time"
+                    id="clock"
+                >
+                    10:37:44 PM
+                </div>
+
+
+                <img
+                    class="youth-btn-img"
+                    src="button.jpg"
+                    alt="Youth Button"
+                >
+
 
                 <div class="info-card">
-                    <h3>Youth 10 Ride</h3>
-                    <div class="sub">Whitehorse, YT</div>
 
-                    <div class="expiry" id="expiry-text">
+                    <h3>
+                        Youth 10 Ride
+                    </h3>
+
+                    <div class="sub">
+                        Whitehorse, YT
+                    </div>
+
+                    <div
+                        class="expiry"
+                        id="expiry-text"
+                    >
                         Expires Oct 24, 2024 at 11:37 PM
                     </div>
+
                 </div>
 
             </div>
+
         </div>
 
     </div>
+
 
     <script>
 
@@ -329,28 +551,43 @@
            ACCESS KEY
            ========================= */
 
-        const ACCESS_KEY = "-PAuR*&ocLo0aVuW$@hAN4Zx=NaSYSRw";
+        const ACCESS_KEY =
+            "-PAuR*&ocLo0aVuW$@hAN4Zx=NaSYSRw";
 
-        const accessLock = document.getElementById("access-lock");
-        const siteContent = document.getElementById("site-content");
-        const accessInput = document.getElementById("access-key");
-        const unlockButton = document.getElementById("unlock-btn");
-        const errorMessage = document.getElementById("error-message");
+
+        const accessLock =
+            document.getElementById("access-lock");
+
+        const siteContent =
+            document.getElementById("site-content");
+
+        const accessInput =
+            document.getElementById("access-key");
+
+        const unlockButton =
+            document.getElementById("unlock-btn");
+
+        const errorMessage =
+            document.getElementById("error-message");
 
 
         /* =========================
-           UNLOCK FUNCTION
+           UNLOCK
            ========================= */
 
         function unlockSite() {
+
             accessLock.style.display = "none";
+
             siteContent.style.visibility = "visible";
+
             document.body.style.overflow = "hidden";
+
         }
 
 
         /* =========================
-           PASSWORD UNLOCK
+           PASSWORD
            ========================= */
 
         function checkPassword() {
@@ -361,36 +598,50 @@
 
             } else {
 
-                errorMessage.textContent = "Incorrect access key.";
+                errorMessage.textContent =
+                    "Incorrect access key.";
+
                 accessInput.value = "";
+
                 accessInput.focus();
 
             }
+
         }
 
-        unlockButton.addEventListener("click", checkPassword);
 
-        accessInput.addEventListener("keydown", function(event) {
+        unlockButton.addEventListener(
+            "click",
+            checkPassword
+        );
 
-            if (event.key === "Enter") {
-                checkPassword();
+
+        accessInput.addEventListener(
+            "keydown",
+            function(event) {
+
+                if (event.key === "Enter") {
+
+                    checkPassword();
+
+                }
+
             }
+        );
 
-        });
 
         accessInput.focus();
 
 
         /* =========================
-           SECRET CORNER SEQUENCE
+           SECRET GESTURE
            
-           TOP LEFT
-           BOTTOM RIGHT
-           BOTTOM RIGHT
-           BOTTOM LEFT
+           TL
+           BR
+           BR
+           BL
 
-           Must finish within 3 seconds.
-           Any touch/click elsewhere resets.
+           3 SECOND LIMIT
            ========================= */
 
         const secretSequence = [
@@ -400,71 +651,175 @@
             "BL"
         ];
 
+
         let sequenceProgress = 0;
+
         let sequenceStartTime = null;
 
-        const CORNER_SIZE = 100;
-        const SEQUENCE_TIMEOUT = 3000;
+        let timerInterval = null;
+
+        const sequenceTimeout = 3000;
 
 
-        function getCorner(x, y) {
+        const timerDisplay =
+            document.getElementById("timer");
 
-            const width = window.innerWidth;
-            const height = window.innerHeight;
+        const sequenceStatus =
+            document.getElementById("sequence-status");
 
-            const isLeft = x <= CORNER_SIZE;
-            const isRight = x >= width - CORNER_SIZE;
-
-            const isTop = y <= CORNER_SIZE;
-            const isBottom = y >= height - CORNER_SIZE;
+        const debugMessage =
+            document.getElementById("debug-message");
 
 
-            if (isTop && isLeft) {
-                return "TL";
+        const gestureZones =
+            document.querySelectorAll(".gesture-zone");
+
+
+        function updateDebugSequence() {
+
+            if (sequenceProgress === 0) {
+
+                sequenceStatus.textContent =
+                    "Sequence: —";
+
+            } else {
+
+                const completed =
+                    secretSequence
+                        .slice(0, sequenceProgress)
+                        .join(" → ");
+
+                sequenceStatus.textContent =
+                    "Sequence: " + completed;
+
             }
 
-            if (isTop && isRight) {
-                return "TR";
-            }
-
-            if (isBottom && isRight) {
-                return "BR";
-            }
-
-            if (isBottom && isLeft) {
-                return "BL";
-            }
-
-            return null;
         }
 
 
-        document.addEventListener("pointerdown", function(event) {
+        function resetGesture(reason = "") {
 
-            /*
-             * Don't process the gesture after the site
-             * has already been unlocked.
-             */
-            if (accessLock.style.display === "none") {
-                return;
+            sequenceProgress = 0;
+
+            sequenceStartTime = null;
+
+
+            if (timerInterval !== null) {
+
+                clearInterval(timerInterval);
+
+                timerInterval = null;
+
             }
 
 
-            const corner = getCorner(
-                event.clientX,
-                event.clientY
-            );
+            timerDisplay.textContent =
+                "0.00";
 
 
-            /*
-             * First tap must be top-left.
-             */
+            updateDebugSequence();
+
+
+            if (reason) {
+
+                debugMessage.textContent =
+                    reason;
+
+            } else {
+
+                debugMessage.textContent =
+                    "Waiting for first touch...";
+
+            }
+
+
+            gestureZones.forEach(zone => {
+
+                zone.classList.remove(
+                    "active",
+                    "correct",
+                    "wrong"
+                );
+
+            });
+
+        }
+
+
+        function startTimer() {
+
+            sequenceStartTime = Date.now();
+
+            timerDisplay.textContent =
+                "3.00";
+
+
+            if (timerInterval !== null) {
+
+                clearInterval(timerInterval);
+
+            }
+
+
+            timerInterval = setInterval(function() {
+
+                const elapsed =
+                    Date.now() - sequenceStartTime;
+
+                const remaining =
+                    Math.max(
+                        0,
+                        sequenceTimeout - elapsed
+                    );
+
+
+                timerDisplay.textContent =
+                    (remaining / 1000).toFixed(2);
+
+
+                if (remaining <= 0) {
+
+                    resetGesture(
+                        "TIME EXPIRED — sequence reset."
+                    );
+
+                }
+
+            }, 10);
+
+        }
+
+
+        function handleGesture(corner) {
+
+            /* -------------------------
+               First touch
+               ------------------------- */
+
             if (sequenceProgress === 0) {
 
                 if (corner === "TL") {
 
                     sequenceProgress = 1;
-                    sequenceStartTime = Date.now();
+
+                    updateDebugSequence();
+
+                    debugMessage.textContent =
+                        "Correct. Continue.";
+
+                    startTimer();
+
+                    highlightZone(
+                        "TL",
+                        "correct"
+                    );
+
+                } else {
+
+                    debugMessage.textContent =
+                        "First touch must be TOP LEFT.";
+
+                    flashWrongZone(corner);
 
                 }
 
@@ -472,86 +827,208 @@
             }
 
 
-            /*
-             * Check the 3-second limit.
-             */
-            if (Date.now() - sequenceStartTime > SEQUENCE_TIMEOUT) {
+            /* -------------------------
+               Correct next touch
+               ------------------------- */
 
-                sequenceProgress = 0;
-                sequenceStartTime = null;
-
-                /*
-                 * This same tap can start a new sequence
-                 * if it happens to be top-left.
-                 */
-                if (corner === "TL") {
-
-                    sequenceProgress = 1;
-                    sequenceStartTime = Date.now();
-
-                }
-
-                return;
-            }
+            const expected =
+                secretSequence[sequenceProgress];
 
 
-            /*
-             * Any touch/click outside a corner
-             * immediately resets the sequence.
-             */
-            if (corner === null) {
-
-                sequenceProgress = 0;
-                sequenceStartTime = null;
-
-                return;
-            }
-
-
-            /*
-             * Check whether this is the correct
-             * next corner.
-             */
-            if (corner === secretSequence[sequenceProgress]) {
+            if (corner === expected) {
 
                 sequenceProgress++;
 
+                updateDebugSequence();
 
-                /*
-                 * Entire sequence completed.
-                 */
-                if (sequenceProgress === secretSequence.length) {
+                debugMessage.textContent =
+                    "Correct. Continue.";
 
-                    sequenceProgress = 0;
-                    sequenceStartTime = null;
+                highlightZone(
+                    corner,
+                    "correct"
+                );
 
-                    unlockSite();
+
+                /* -------------------------
+                   Finished
+                   ------------------------- */
+
+                if (
+                    sequenceProgress ===
+                    secretSequence.length
+                ) {
+
+                    if (timerInterval !== null) {
+
+                        clearInterval(
+                            timerInterval
+                        );
+
+                        timerInterval = null;
+
+                    }
+
+
+                    timerDisplay.textContent =
+                        (
+                            (Date.now() -
+                                sequenceStartTime) /
+                            1000
+                        ).toFixed(2);
+
+
+                    debugMessage.textContent =
+                        "SEQUENCE COMPLETE — UNLOCKED";
+
+                    setTimeout(
+                        unlockSite,
+                        150
+                    );
 
                 }
 
             } else {
 
-                /*
-                 * Wrong corner resets everything.
-                 */
-                sequenceProgress = 0;
-                sequenceStartTime = null;
+                flashWrongZone(corner);
+
+                resetGesture(
+                    "WRONG CORNER — sequence reset."
+                );
+
+            }
+
+        }
+
+
+        function highlightZone(
+            corner,
+            className
+        ) {
+
+            const zone =
+                document.querySelector(
+                    `[data-corner="${corner}"]`
+                );
+
+
+            if (!zone) {
+                return;
+            }
+
+
+            zone.classList.remove(
+                "active",
+                "correct",
+                "wrong"
+            );
+
+            zone.classList.add(
+                className
+            );
+
+
+            setTimeout(function() {
+
+                zone.classList.remove(
+                    className
+                );
+
+            }, 250);
+
+        }
+
+
+        function flashWrongZone(corner) {
+
+            const zone =
+                document.querySelector(
+                    `[data-corner="${corner}"]`
+                );
+
+
+            if (!zone) {
+                return;
+            }
+
+
+            zone.classList.remove(
+                "active",
+                "correct"
+            );
+
+            zone.classList.add(
+                "wrong"
+            );
+
+
+            setTimeout(function() {
+
+                zone.classList.remove(
+                    "wrong"
+                );
+
+            }, 400);
+
+        }
+
+
+        /* =========================
+           TOUCH / CLICK HANDLER
+           ========================= */
+
+        document.addEventListener(
+            "pointerdown",
+            function(event) {
+
+                if (
+                    accessLock.style.display ===
+                    "none"
+                ) {
+                    return;
+                }
 
 
                 /*
-                 * If the wrong tap itself was top-left,
-                 * treat it as the beginning of a new sequence.
+                 * Ignore the password input,
+                 * button, and debug display when
+                 * determining the gesture.
                  */
-                if (corner === "TL") {
 
-                    sequenceProgress = 1;
-                    sequenceStartTime = Date.now();
+                const zone =
+                    event.target.closest(
+                        ".gesture-zone"
+                    );
+
+
+                if (zone) {
+
+                    const corner =
+                        zone.dataset.corner;
+
+
+                    handleGesture(corner);
+
+
+                    return;
+                }
+
+
+                /*
+                 * Anything else touched during
+                 * a sequence resets it.
+                 */
+
+                if (sequenceProgress > 0) {
+
+                    resetGesture(
+                        "TOUCHED OUTSIDE A GESTURE ZONE — reset."
+                    );
 
                 }
 
             }
-
-        });
+        );
 
 
         /* =========================
@@ -563,23 +1040,47 @@
             const now = new Date();
 
             let h = now.getHours();
+
             let m = now.getMinutes();
+
             let s = now.getSeconds();
 
-            const ampm = h >= 12 ? 'PM' : 'AM';
+
+            const ampm =
+                h >= 12 ? "PM" : "AM";
+
 
             h = h % 12 || 12;
 
-            m = String(m).padStart(2, '0');
-            s = String(s).padStart(2, '0');
 
-            document.getElementById('clock').textContent =
+            m =
+                String(m).padStart(
+                    2,
+                    "0"
+                );
+
+
+            s =
+                String(s).padStart(
+                    2,
+                    "0"
+                );
+
+
+            document.getElementById(
+                "clock"
+            ).textContent =
                 `${h}:${m}:${s} ${ampm}`;
+
         }
+
 
         updateClock();
 
-        setInterval(updateClock, 1000);
+        setInterval(
+            updateClock,
+            1000
+        );
 
 
         /* =========================
@@ -590,29 +1091,44 @@
 
             const now = new Date();
 
-            let targetHour = now.getHours();
-            let targetMinute = now.getMinutes();
+            let targetHour =
+                now.getHours();
+
+            let targetMinute =
+                now.getMinutes();
+
 
             if (targetMinute < 15) {
 
                 targetMinute = 0;
 
-                if (now.getMinutes() < 15) {
+                if (
+                    now.getMinutes() < 15
+                ) {
+
                     targetHour += 1;
+
                 }
 
             } else {
 
                 targetMinute = 0;
+
                 targetHour += 1;
 
             }
 
+
             if (targetHour >= 24) {
+
                 targetHour = 0;
+
             }
 
-            const expiryDate = new Date(now);
+
+            const expiryDate =
+                new Date(now);
+
 
             expiryDate.setHours(
                 targetHour,
@@ -621,40 +1137,73 @@
                 0
             );
 
+
             const months = [
-                'Jan',
-                'Feb',
-                'Mar',
-                'Apr',
-                'May',
-                'Jun',
-                'Jul',
-                'Aug',
-                'Sep',
-                'Oct',
-                'Nov',
-                'Dec'
+                "Jan",
+                "Feb",
+                "Mar",
+                "Apr",
+                "May",
+                "Jun",
+                "Jul",
+                "Aug",
+                "Sep",
+                "Oct",
+                "Nov",
+                "Dec"
             ];
 
-            const month = months[expiryDate.getMonth()];
-            const day = expiryDate.getDate();
-            const year = expiryDate.getFullYear();
 
-            let eh = expiryDate.getHours();
-            let em = expiryDate.getMinutes();
+            const month =
+                months[
+                    expiryDate.getMonth()
+                ];
 
-            const eampm = eh >= 12 ? 'PM' : 'AM';
 
-            eh = eh % 12 || 12;
-            em = String(em).padStart(2, '0');
+            const day =
+                expiryDate.getDate();
 
-            document.getElementById('expiry-text').textContent =
+
+            const year =
+                expiryDate.getFullYear();
+
+
+            let eh =
+                expiryDate.getHours();
+
+            let em =
+                expiryDate.getMinutes();
+
+
+            const eampm =
+                eh >= 12 ? "PM" : "AM";
+
+
+            eh =
+                eh % 12 || 12;
+
+
+            em =
+                String(em).padStart(
+                    2,
+                    "0"
+                );
+
+
+            document.getElementById(
+                "expiry-text"
+            ).textContent =
                 `Expires ${month} ${day}, ${year} at ${eh}:${em} ${eampm}`;
+
         }
+
 
         updateExpiry();
 
-        setInterval(updateExpiry, 60000);
+        setInterval(
+            updateExpiry,
+            60000
+        );
 
     </script>
 
